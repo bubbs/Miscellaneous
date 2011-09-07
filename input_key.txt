@@ -1,0 +1,40 @@
+SYNOPSIS
+        void input_key(string|closure callback, varargs mixed* args);
+
+DESCRIPTION
+        Catch the next key press by the current user, passing the key name
+        to the callback function (and with any other additional arguments).
+        If the argument is a string, it is taken as a function name in the
+        previous object (for external calls), or the current object.
+
+        This function operates by combining a series of calls to input_to()
+        (in character-mode), buffering the result until a recognised key
+        definition is found.  The key definition is translated to a symbolic
+        key name that is then passed to the provided callback.
+
+        The key definitions set is based on VT100 and XTerm key definitions.
+
+EXAMPLES
+        void press() { input_key((: printf("You pressed the %s key.\n", $1) :)); }
+
+        void view_file(string answer, string file) {
+            if (!file);
+            else if ((answer == "y") || (answer == "Y") || (answer == "^[y") || (answer == "^[Y") || (answer == "SPACE") || (answer == "^M"))
+                write(read_file(file) || sprintf("[Unable to read file '%s'.]\n", file));
+            else if ((answer == "n") || (answer == "N") || (answer == "^[n") || (answer == "^[N") || (answer == "^C") || (answer == "^[^[^["));
+            else {
+                printf("View file '%s'? [Yn] ", file);
+                input_key(#'view_file, file);
+            }
+        }
+
+HISTORY
+        Bubbs, August 2011: After years of mucking around with key recognition
+        engines, this is designed to have the simplest interface possible.
+
+BUGS
+        Keys such as Escape are used as part of meta-key definitions; thus
+        they cannot be recognised as keys in their own right.
+
+SEE ALSO
+        input_to(E)
